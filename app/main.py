@@ -9,9 +9,11 @@ origins = [
     "https://www.google.com"
     # "http://localhost",
     # "http://localhost:8080",
+    "*"
 ]
 
-models.Base.metadata.create_all(bind=engine)
+# Dont need this command since we have alembic now
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
