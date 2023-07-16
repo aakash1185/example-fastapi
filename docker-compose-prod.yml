@@ -1,0 +1,42 @@
+version: '3'
+services:
+  api:
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - 80:8000
+    # volumes:
+    #   - ./:/usr/src/app
+    # env_file:
+    #   - ./.env
+    environment:
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_PORT={DATABASE_PORT}
+      - DATABASE_PASSWORD={DATABASE_PASSWORD}
+      - DATABASE_USERNAME={DATABASE_USERNAME}
+      - DATABASE_NAME={DATABASE_NAME}
+      - SECRET_KEY={SECRET_KEY}
+      - ALGORITHM={ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES={ACCESS_TOKEN_EXPIRE_MINUTES}
+
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+  postgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER={DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=={DATABASE_PASSWORD}
+      - POSTGRES_DB={DATABASE_NAME}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+volumes:
+  postgres-db:
+
+# At 13:55:05 for those who wondering what causing the Internal server error. In the postgres docker container the tables are not creating, so we need to create the tables in order perform the requested action on localhost:8000.
+# Follow these steps it has worked for me
+# 1) Put the command docker ps and find your container ID
+# 2) Then enter into the bash -> docker exec -t YOUR_CONTAINER_ID bash
+# 3) Now it will enter into the bash, type -> alembic upgrade head
+# This will fix the issue by creating the tables to perform the action. Now go to Postman API and run the create user request, it will work. But the only issue is the data is not storing.
